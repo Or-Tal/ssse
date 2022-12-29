@@ -1,0 +1,61 @@
+# WARNING: This is the base configuration file shared across ALL solvers in MAGMA
+# Please don't update this file directly. Instead use distinct configuration files
+# to override the below configuration.
+defaults:
+  - _self_
+  - dset: noisy
+  - solver: solver_default
+  - loss: se_loss
+  - model: se_dual_ae
+
+device: cuda
+dtype: float32
+autocast: false
+seed: 2036
+show: 0  # just show the model and its size and exit
+generate_only: 0  # just generate from the solver
+
+label:  # use this if you want twice the same exp, with a name.
+
+logging:
+  level: INFO
+  log_updates: 10
+  log_tensorboard: false
+  log_wandb: false
+
+tensorboard:
+  with_media_logging: false
+  name:  # optional name for the experiment
+  sub_dir:  # optional sub directory to store tensorboard data
+
+wandb:
+  with_media_logging: false
+  project:  # project name
+  name:  # optional name for the experiment
+  group:  # optional group
+
+# SLURM launcher configuration.
+slurm:
+  gpus: 4  # convenience parameter, number of GPUs to use.
+  mem_per_gpu: 40  # in GB, total mem is automatically scaled with `gpus`.
+  time: 3600
+  constraint: volta32gb
+  partition: learnlab
+  comment:
+  setup: ['module load cudnn/v8.0.3.33-cuda.11.0 NCCL/2.8.3-1-cuda.11.0']
+
+dora:
+  # Output folder for all artifacts of an experiment.
+  dir: ./outputs
+  # The following entries will be ignored by dora when computing the unique XP signature.
+  # Note that slurm.* and dora.* are automatically ignored.
+  exclude: [
+    'device', 'wandb.*', 'tensorboard.*', 'logging.*',
+    'data.num_workers', 'eval.num_workers', 'special.*',
+    'metrics.visqol.bin', 'generate_only', 'generate.*',
+  ]
+  use_rendezvous: false
+  # for grids, always run from a clean repo, allowing reliable runs and storing
+  # the exact commit. Your repo must be absolutely pristine clean.
+  # Local `dora run` are not impacted for easier debugging.
+  git_save: true

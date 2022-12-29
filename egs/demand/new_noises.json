@@ -1,0 +1,14 @@
+{
+    "PRESTO": [
+        [
+            "/checkpoint/ortal1/Dsets/DEMAND/PRESTO/ch04.wav",
+            4800064
+        ]
+    ],
+    "PCAFETER": [
+        [
+            "/checkpoint/ortal1/Dsets/DEMAND/PCAFETER/ch11.wav",
+            4800064
+        ]
+    ]
+}

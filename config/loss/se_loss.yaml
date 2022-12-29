@@ -1,0 +1,13 @@
+# @package __global__
+# Author: Or Tal.
+loss:
+  loss_name: se_loss
+
+  just_reconstruction: False
+  reconstruction_factor: 0.1
+  contrastive_factor: 10
+  noise_regularization_factor: 0.1
+  stft_sc_factor: 0.1
+  stft_mag_factor: 0.1
+  include_regularization: True
+  include_contrastive: True

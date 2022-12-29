@@ -1,0 +1,8 @@
+egs/jamendo/*/*.jsonl.gz filter=lfs diff=lfs merge=lfs -text
+egs/mmi/mmi_11k_48khz/*/*.jsonl.gz filter=lfs diff=lfs merge=lfs -text
+egs/mmi/mmi_11k_24khz/*/*.jsonl.gz filter=lfs diff=lfs merge=lfs -text
+egs/mmi/mmi_11k_32khz/*/*.jsonl.gz filter=lfs diff=lfs merge=lfs -text
+egs/jammi/jammi_11k_24khz/*/*.jsonl.gz filter=lfs diff=lfs merge=lfs -text
+egs/jammi/jammi_11k_32khz/*/*.jsonl.gz filter=lfs diff=lfs merge=lfs -text
+egs/jamendo/audio_32khz/*/*.jsonl.gz filter=lfs diff=lfs merge=lfs -text
+egs/**/*.jsonl.gz filter=lfs diff=lfs merge=lfs -text

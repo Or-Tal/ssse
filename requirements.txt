@@ -1,0 +1,12 @@
+# please make sure you have already a pytorch install that is cuda enabled!
+numpy
+soundfile
+torch
+torchaudio
+einops
+julius
+tqdm
+hydra-core>=1.1
+hydra_colorlog
+dora-search @ git+https://git@github.com/facebookresearch/dora@main#egg=dora-search
+flashy @ git+ssh://git@github.com/fairinternal/flashy@main#egg=flashy

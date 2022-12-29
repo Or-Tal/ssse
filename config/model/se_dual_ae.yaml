@@ -1,0 +1,41 @@
+# @package __global__
+
+model:
+  # instansiation related
+  model_class_name: se_dual_ae
+
+  encoder_model: demucs_encoder
+  decoder_model: demucs_decoder
+  feature_model: blstm_feature
+
+  # general
+  include_skips_in_fw_pass: true
+
+  # modules related
+  demucs:
+    chin: 1
+    chout: 1
+    hidden: 48
+    depth: 5
+    kernel_size: 8
+    stride: 4
+    resample: 4
+    causal: false
+    growth: 2
+    max_hidden: 10000
+    normalize: true
+    rescale: 0.1
+    floor: 1e-3
+
+
+  wav2vec_encoder:
+  #  encoder_layers: 6
+    encoder_layers: 12
+
+  hifi_gan_generator:
+    input_channels: 768
+    upsample_initial_channel: 256
+
+  feature_encoder:
+    window_size: 5
+    hidden_size: 512
