@@ -162,7 +162,7 @@ class BaseSolver(ABC, flashy.BaseSolver):
     def should_run_stage(self, stage_name) -> bool:
         """Check whether we want to run the specified stages.
         """
-        stage_every = self.cfg[stage_name].get('every', None)
+        stage_every = self.cfg.dset.eval_every[stage_name].get('every', None)
         is_last_epoch = self.epoch == self.cfg.solver.optim.epochs
         is_epoch_every = (stage_every and self.epoch % stage_every == 0)
         return is_last_epoch or is_epoch_every

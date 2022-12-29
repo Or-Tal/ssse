@@ -1,7 +1,7 @@
 import typing as tp
 import treetable as tt
 
-from .base_explorer import BaseExplorer
+from ._base_explorer import BaseExplorer
 
 class SsseBaseExplorer(BaseExplorer):
     eval_metrics: tp.List[str] = []

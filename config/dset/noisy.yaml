@@ -19,6 +19,11 @@ dset:
     num_workers: 10
     shuffle: True
 
+  eval_every:
+    valid: 1
+    evaluate: 5
+    generate: 
+
   # noiser related
   #noises: egs/demand/noises.json
   noises: /checkpoint/ortal1/Projects/ssse/egs/demand/new_noises.json
