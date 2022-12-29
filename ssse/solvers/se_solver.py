@@ -2,13 +2,13 @@ from concurrent.futures import ThreadPoolExecutor
 import os
 import flashy
 import omegaconf
-from solvers.base_solver import BaseSolver
-from models.model_factory import model_factory
-from data.data_factory import dataloaders_factory
+from .base_solver import BaseSolver
+from ..models.model_factory import model_factory
+from ..data.data_factory import dataloaders_factory
 import torch
-from losses.loss_factory import loss_factory
-from metrics.metrics_factory import get_pesq, get_snr, get_stoi
-from optim.optimizer_factory import optimizer_factory
+from ..losses.loss_factory import loss_factory
+from ..metrics.metrics_factory import get_pesq, get_snr, get_stoi
+from ..optim.optimizer_factory import optimizer_factory
 
 
 class SESolver(BaseSolver):

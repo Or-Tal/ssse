@@ -9,7 +9,7 @@ import flashy
 import hydra
 import omegaconf
 from magma.utils.cluster import get_dora_dir, get_slurm_parameters
-from solvers.solver_factory import solver_factory
+from .solvers.solver_factory import solver_factory
 
 
 logger = logging.getLogger(__name__)

@@ -15,7 +15,7 @@ dset:
 
   # dataloader related
   dataloader:
-    batch_size: 32
+    batch_size: 192
     num_workers: 10
     shuffle: True
 
