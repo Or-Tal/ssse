@@ -1,3 +1,4 @@
+import torch
 from .visqol import ViSQOL
 
 # from .. import losses
@@ -68,5 +69,5 @@ def get_stoi(ref_sig, out_sig, sr):
 
 
 def get_snr(signal, noise):
-    return (signal**2).mean()/(noise**2).mean()
+    return 10 * torch.log10((signal**2)/(noise**2 + 1e-10)).mean()
 
