@@ -107,8 +107,8 @@ class SESolver(BaseSolver):
         estimate_numpy = estimate.cpu().squeeze(1).numpy()
         clean_numpy = clean_sigs.cpu().squeeze(1).numpy()
 
-        metrics['pesq'] = get_pesq(clean_numpy, estimate_numpy, sr=self.cfg.sample_rate)
-        metrics['stoi'] = get_stoi(clean_numpy, estimate_numpy, sr=self.cfg.sample_rate)
+        metrics['pesq'] = get_pesq(clean_numpy, estimate_numpy, sr=self.cfg.dset.sample_rate)
+        metrics['stoi'] = get_stoi(clean_numpy, estimate_numpy, sr=self.cfg.dset.sample_rate)
 
         return metrics
 

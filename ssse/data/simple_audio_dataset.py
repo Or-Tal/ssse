@@ -71,7 +71,7 @@ class SimpleAudioDataset:
         out, sr = torchaudio.load(str(file), **kwargs)
 
         # validation check
-        target_sr, target_channels = self.cfg.sample_rate or sr, self.cfg.channels or out.shape[0]
+        target_sr, target_channels = self.cfg.dset.sample_rate or sr, self.cfg.channels or out.shape[0]
         assert target_sr == sr, f"Expected {file} to have sample rate of {target_sr}, but got {sr}"
         assert out.shape[
                    0] == target_channels, f"Expected {file} to have channels of {target_channels}, but got {out.shape[0]}"
