@@ -60,6 +60,8 @@ class SESolver(BaseSolver):
         Perform one training or valid step on a given batch.
         """
         validation = not is_training
+        if len(batch) == 3:
+            noisy_sigs, _, vad_mask = batch
         if not validation:
             noisy_sigs, _, vad_mask = batch
         else:
@@ -90,6 +92,7 @@ class SESolver(BaseSolver):
 
     def run_evaluation(self, batch, metrics):
         noisy_sigs, clean_sigs, vad_mask, _ = batch
+        noisy_sigs = noisy_sigs.to(self.device)
         with torch.no_grad():
             estimate = self.model(noisy_sigs, eval=True)
         if clean_sigs.shape[-1] > estimate.shape[-1]:
