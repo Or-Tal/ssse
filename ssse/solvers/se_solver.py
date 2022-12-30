@@ -93,6 +93,7 @@ class SESolver(BaseSolver):
     def run_evaluation(self, batch, metrics):
         noisy_sigs, clean_sigs, vad_mask, _ = batch
         noisy_sigs = noisy_sigs.to(self.device)
+        clean_sigs = clean_sigs.to(self.device)
         with torch.no_grad():
             estimate = self.model(noisy_sigs, eval=True)
         if clean_sigs.shape[-1] > estimate.shape[-1]:
