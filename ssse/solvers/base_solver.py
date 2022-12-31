@@ -8,6 +8,7 @@ import omegaconf
 import torch
 from torch import nn
 from magma.utils.checkpoint import CheckpointManager, get_checkpoint_manager
+import wandb
 
 
 class BaseSolver(ABC, flashy.BaseSolver):
@@ -107,6 +108,11 @@ class BaseSolver(ABC, flashy.BaseSolver):
             self.save_checkpoints()
         # This will increase self.epoch
         self.history.append(self._pending_metrics)
+
+        # log
+        if self.cfg.logging.log_wandb:
+            wandb.log(self._pending_metrics, step=self.epoch)
+
         self._start_epoch()
         if flashy.distrib.is_rank_zero():
             self.xp.link.update_history(self.history)
@@ -140,16 +146,24 @@ class BaseSolver(ABC, flashy.BaseSolver):
 
             # Stages are used for automatic metric reporting to Dora, and it also
             # allows tuning how metrics are formatted.
-            self.run_stage('train', self.train)
+            metrics = self.run_stage('train', self.train)
+            for k, v in metrics.items():
+                self._pending_metrics[f"train_{k}"] = v
 
             if self.should_run_stage('valid'):
                 self.run_stage('valid', self.valid)
+                for k, v in metrics.items():
+                    self._pending_metrics[f"valid_{k}"] = v
 
             if self.should_run_stage('evaluate'):
                 self.run_stage('evaluate', self.evaluate)
+                for k, v in metrics.items():
+                    self._pending_metrics[f"evaluate_{k}"] = v
 
             if self.should_run_stage('generate'):
                 self.run_stage('generate', self.generate)
+                for k, v in metrics.items():
+                    self._pending_metrics[f"generate_{k}"] = v
 
             # Commit will send the metrics to Dora and save checkpoints by default.
             self.commit()
