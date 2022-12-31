@@ -12,6 +12,7 @@ dset:
 
   dataset_class: noisy_dataset
   dataloader_class: noisy_loader
+  sample_from_gaussian: False
 
   # dataloader related
   dataloader:

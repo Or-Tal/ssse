@@ -9,9 +9,10 @@ def explorer(launcher):
     launcher.slurm_(gpus=8, partition='devlab')
     launcher.bind_({
         'solver': 'solver_default',
-        'solver.optim.epochs': 500,
+        'solver.optim.epochs': 400,
     })
+
     with launcher.job_array():
-        sub = launcher.bind({'loss.include_regularization': True, 'loss.include_contrastive': True}) 
-        for reg, cont in product([True, False], [True, False]):
-            sub({'loss.include_regularization': reg, 'loss.include_contrastive': cont})
+        sub = launcher.bind({'loss.include_regularization': True, 'loss.include_contrastive': True, 'dset.sample_from_gaussian': False}) 
+        for reg, cont, gaussian in product([True, False], [True, False], [True, False]):
+            sub({'loss.include_regularization': reg, 'loss.include_contrastive': cont, 'dset.sample_from_gaussian': gaussian})
