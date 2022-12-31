@@ -126,6 +126,8 @@ class SupSELoss(SELoss):
     def forward(self, outputs, noisy_sigs, clean_sigs, vad_mask):
         _, _, y_hat, z_hat, w_c, w_n = outputs
         device = f"{f'cuda' if w_c.is_cuda else 'cpu'}"
+        y_hat, z_hat, w_c, w_n, noisy_sigs, clean_sigs, vad_mask = (y_hat.to(device), z_hat.to(device), w_c.to(device), w_n.to(device), 
+                                                                    noisy_sigs.to(device), clean_sigs.to(device), vad_mask.to(device))
         if noisy_sigs.shape[-1] > y_hat.shape[-1]:
             noisy_sigs = noisy_sigs[..., :y_hat.shape[-1]]
         elif noisy_sigs.shape[-1] < y_hat.shape[-1]:

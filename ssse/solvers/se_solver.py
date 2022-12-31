@@ -59,7 +59,11 @@ class SESolver(BaseSolver):
         """
         Perform one training or valid step on a given batch.
         """
-        noisy_sigs, vad_mask = batch
+        if len(batch) > 2:
+            noisy_sigs = batch[0]
+            vad_mask = batch[-1]
+        else:
+            noisy_sigs, vad_mask = batch
         noisy_sigs = noisy_sigs.to(self.device)
         vad_mask = vad_mask.to(self.device)
 
