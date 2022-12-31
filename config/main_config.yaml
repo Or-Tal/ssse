@@ -21,7 +21,7 @@ logging:
   level: INFO
   log_updates: 10
   log_tensorboard: false
-  log_wandb: false
+  log_wandb: true
 
 tensorboard:
   with_media_logging: false
@@ -30,7 +30,7 @@ tensorboard:
 
 wandb:
   with_media_logging: false
-  project:  # project name
+  project:  "SelfSupervisedSpeechEnhancement"
   name:  # optional name for the experiment
   group:  # optional group
 

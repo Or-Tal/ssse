@@ -13,6 +13,6 @@ def explorer(launcher):
     })
 
     with launcher.job_array():
-        sub = launcher.bind({'loss.include_contrastive': True, 'dset.sample_from_gaussian': False}) 
+        sub = launcher.bind({'loss.include_contrastive': True, 'dset.sample_from_gaussian': False, 'wandb.name': f"base_exp"}) 
         for cont, gaussian in product([True, False], [True, False]):
-            sub({'loss.include_contrastive': cont, 'dset.sample_from_gaussian': gaussian})
+            sub({'loss.include_contrastive': cont, 'dset.sample_from_gaussian': gaussian, 'wandb.name': f"base_exp_c{int(cont)}_g{int(gaussian)}"})
