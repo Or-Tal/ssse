@@ -59,17 +59,11 @@ class SESolver(BaseSolver):
         """
         Perform one training or valid step on a given batch.
         """
-        validation = not is_training
-        if len(batch) == 3:
-            noisy_sigs, _, vad_mask = batch
-        if not validation:
-            noisy_sigs, _, vad_mask = batch
-        else:
-            noisy_sigs, vad_mask = batch
+        noisy_sigs, vad_mask = batch
         noisy_sigs = noisy_sigs.to(self.device)
         vad_mask = vad_mask.to(self.device)
 
-        if validation:
+        if not is_training:
             with torch.no_grad():
                 outputs = self.model(noisy_sigs)
         else:

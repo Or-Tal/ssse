@@ -9,7 +9,6 @@ from .multi_res_stft_loss import MultiResolutionSTFTLoss
 EPS = 1e-10
 NEG_SIZE = 10
 
-
 class SELoss(nn.Module):
 
     def __init__(self,loss_cfg: omegaconf.DictConfig, device='cpu'):
@@ -119,3 +118,32 @@ class SELoss(nn.Module):
 
         return self.reconstruction_factor * reconstruction_loss + self.contrastive_factor * contrastive_loss + \
                self.noise_regularization_factor * reg_loss
+
+
+
+class SupSELoss(SELoss):
+
+    def forward(self, outputs, noisy_sigs, clean_sigs, vad_mask):
+        _, _, y_hat, z_hat, w_c, w_n = outputs
+        device = f"{f'cuda' if w_c.is_cuda else 'cpu'}"
+        if noisy_sigs.shape[-1] > y_hat.shape[-1]:
+            noisy_sigs = noisy_sigs[..., :y_hat.shape[-1]]
+        elif noisy_sigs.shape[-1] < y_hat.shape[-1]:
+            y_hat = y_hat[..., :noisy_sigs.shape[-1]]
+            z_hat = z_hat[..., :noisy_sigs.shape[-1]]
+
+        est_noisy = y_hat + z_hat
+        fc, mag = self.m_stft_loss(est_noisy.squeeze(1), noisy_sigs.squeeze(1))
+        if torch.isnan(est_noisy).any():
+            print("passed nan value from ae")
+        fc_c, mag_c = self.m_stft_loss(y_hat.squeeze(1), clean_sigs.squeeze(1))
+        reconstruction_loss = F.l1_loss(est_noisy, noisy_sigs).to(device) + fc + mag + fc_c + mag_c
+        if self.just_reconstruction:
+            return reconstruction_loss
+
+        contrastive_loss = self.contrastive_loss(w_c, w_n, vad_mask, device) if self.include_contrastive else 0
+        reg_loss = self.regularization_loss(vad_mask, z_hat, noisy_sigs) if self.include_regularization else 0
+
+        return self.reconstruction_factor * reconstruction_loss + self.contrastive_factor * contrastive_loss + \
+               self.noise_regularization_factor * reg_loss
+

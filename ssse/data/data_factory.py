@@ -20,6 +20,7 @@ def dataloaders_factory(cfg: omegaconf.DictConfig):
     kwargs = {k: v for k, v in cfg.dset.dataloader.items()}
     kwargs["klass"] = _supported_dataloaders[cfg.dset.dataloader_class] if cfg.dset.dataloader_class in \
                       _supported_dataloaders.keys() else DataLoader
+    include_clean_subsets = {'train', 'valid', 'evaluate'} if 'sup' in cfg.loss.loss_name else {'evaluate'}
     return {
         k: flashy.distrib.loader(v, cfg.dset, include_clean=k in {'train', 'generate'}, **kwargs)
             for k, v in zip(['train', 'valid', 'evaluate', 'generate'], [tr_dset, cv_dset, tt_dset, tt_dset])

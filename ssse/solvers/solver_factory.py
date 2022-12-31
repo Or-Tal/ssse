@@ -1,9 +1,11 @@
 # Author: Or Tal
 import omegaconf
+from .sup_se_solver import SupSESolver
 from .se_solver import SESolver
 
 _supported_solvers = {
     "se": SESolver,
+    "sup_se": SupSESolver,
 }
 
 def solver_factory(cfg: omegaconf.DictConfig):

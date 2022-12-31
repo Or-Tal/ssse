@@ -9,10 +9,18 @@ def explorer(launcher):
     launcher.slurm_(gpus=8, partition='devlab')
     launcher.bind_({
         'solver': 'solver_default',
+        
         'solver.optim.epochs': 400,
     })
 
     with launcher.job_array():
-        sub = launcher.bind({'loss.include_contrastive': True, 'dset.sample_from_gaussian': False, 'wandb.name': f"base_exp"}) 
-        for cont, gaussian in product([True, False], [True, False]):
-            sub({'loss.include_contrastive': cont, 'dset.sample_from_gaussian': gaussian, 'wandb.name': f"base_exp_c{int(cont)}_g{int(gaussian)}"})
+        sub = launcher.bind({'loss.include_contrastive': True, 'dset.sample_from_gaussian': False, 'wandb.name': f"base_exp", 
+                             'solver.solver': 'se', 'loss.loss_name': 'se_loss',}) 
+        for pref in ["", "sup_"]:
+            for cont, gaussian in product([True, False], [True, False]):
+                sub({'loss.include_contrastive': cont, 
+                     'dset.sample_from_gaussian': gaussian, 
+                     'wandb.name': f"base_{pref}c{int(cont)}_g{int(gaussian)}",
+                     'solver.solver': f'{pref}se',
+                     'loss.loss_name': f'{pref}se_loss',
+                     })
