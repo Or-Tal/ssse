@@ -30,9 +30,10 @@ tensorboard:
 
 wandb:
   with_media_logging: false
-  project:  "SelfSupervisedSpeechEnhancement"
+  project:  "SSSE"
   name:  # optional name for the experiment
   group:  # optional group
+  entity: "ortal1"
 
 # SLURM launcher configuration.
 slurm:
