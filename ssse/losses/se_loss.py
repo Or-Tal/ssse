@@ -130,6 +130,7 @@ class SupSELoss(SELoss):
                                                                     noisy_sigs.to(device), clean_sigs.to(device), vad_mask.to(device))
         if noisy_sigs.shape[-1] > y_hat.shape[-1]:
             noisy_sigs = noisy_sigs[..., :y_hat.shape[-1]]
+            clean_sigs = clean_sigs[..., :y_hat.shape[-1]]
         elif noisy_sigs.shape[-1] < y_hat.shape[-1]:
             y_hat = y_hat[..., :noisy_sigs.shape[-1]]
             z_hat = z_hat[..., :noisy_sigs.shape[-1]]
