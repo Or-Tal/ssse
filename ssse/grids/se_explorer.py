@@ -6,10 +6,10 @@ from ._ssse_base_explorer import SsseBaseExplorer
 @SsseBaseExplorer
 def explorer(launcher):
     # partition = get_slurm_partition()
-    launcher.slurm_({'gpus': 8, 'partition': 'devlab', 'cpus-per-gpu': 1, 'mem-per-gpu': '1g'})
+    # launcher.slurm_({'gpus': 8, 'partition': 'devlab', 'cpus-per-gpu': 1, 'mem-per-gpu': '1g'})
+    launcher.slurm_(gpus=8, partition='devlab', cpus_per_gpu=1, mem_per_gpu='1gb')
     launcher.bind_({
         'solver': 'solver_default',
-        
         'solver.optim.epochs': 400,
     })
 
