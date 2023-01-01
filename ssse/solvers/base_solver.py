@@ -111,7 +111,12 @@ class BaseSolver(ABC, flashy.BaseSolver):
 
         # log
         if self.cfg.logging.log_wandb:
-            wandb.log(self._pending_metrics, step=self.epoch)
+            tmp = {}
+            for subset, metrics in self._pending_metrics.items():
+                for k, v in metrics.items():
+                    tmp[f'{subset}_{k}'] = v
+
+            wandb.log(tmp, step=self.epoch)
 
         self._start_epoch()
         if flashy.distrib.is_rank_zero():
@@ -147,23 +152,19 @@ class BaseSolver(ABC, flashy.BaseSolver):
             # Stages are used for automatic metric reporting to Dora, and it also
             # allows tuning how metrics are formatted.
             metrics = self.run_stage('train', self.train)
-            for k, v in metrics.items():
-                self._pending_metrics[f"train_{k}"] = v
+            self._pending_metrics[f"train"] = metrics
 
             if self.should_run_stage('valid'):
-                self.run_stage('valid', self.valid)
-                for k, v in metrics.items():
-                    self._pending_metrics[f"valid_{k}"] = v
+                metrics = self.run_stage('valid', self.valid)
+                self._pending_metrics[f"valid"] = metrics
 
             if self.should_run_stage('evaluate'):
-                self.run_stage('evaluate', self.evaluate)
-                for k, v in metrics.items():
-                    self._pending_metrics[f"evaluate_{k}"] = v
+                metrics = self.run_stage('evaluate', self.evaluate)
+                self._pending_metrics[f"evaluate"] = metrics
 
             if self.should_run_stage('generate'):
-                self.run_stage('generate', self.generate)
-                for k, v in metrics.items():
-                    self._pending_metrics[f"generate_{k}"] = v
+                metrics = self.run_stage('generate', self.generate)
+                self._pending_metrics[f"generate"] = metrics
 
             # Commit will send the metrics to Dora and save checkpoints by default.
             self.commit()
