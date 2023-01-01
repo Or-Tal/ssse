@@ -51,7 +51,7 @@ class SELoss(nn.Module):
 
         vad_mask = vad_mask.to(float)
         # TODO: is + eps really necessary?
-        # vad_mask = vad_mask + EPS
+        vad_mask = vad_mask + EPS
 
         # TODO: remove limitation of length to vad (n < 0) and uncomment line 34
         n = w_c.shape[1] - vad_mask.shape[-1]
