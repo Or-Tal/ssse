@@ -7,7 +7,7 @@ from ._ssse_base_explorer import SsseBaseExplorer
 def explorer(launcher):
     # partition = get_slurm_partition()
     # launcher.slurm_(gpus=8, partition='learnlab', cpus_per_gpu=1)
-    launcher.slurm_(gpus=4, partition='devlab', cpus_per_gpu=1, time=2880)
+    launcher.slurm_(gpus=4, partition='devlab', cpus_per_gpu=1, time=2880, comment='v0.01')
     launcher.bind_({
         'solver': 'solver_default',
         'dset.dataloader.batch_size': 96,

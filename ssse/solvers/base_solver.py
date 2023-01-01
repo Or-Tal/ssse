@@ -21,6 +21,7 @@ class BaseSolver(ABC, flashy.BaseSolver):
         super().__init__()
         self.logger.info(f"Instantiating solver {self.__class__.__name__} for XP {self.xp.sig}")
         self.logger.info(f"All XP logs are stored in {self.xp.folder}")
+        self.log_cfg_summary(cfg)
         self.cfg = cfg
         self.device = cfg.device
         self.model: nn.Module
@@ -32,6 +33,14 @@ class BaseSolver(ABC, flashy.BaseSolver):
         self.build_dataloaders()
         self.build_model()
         self.build_optimizers()
+
+    def log_cfg_summary(self, cfg: omegaconf.DictConfig, pref=""):
+        for k, v in cfg.items():
+            if isinstance(v, omegaconf.DictConfig):
+                self.logger.info(f"{pref}{k}:")
+                self.log_cfg_summary(v, pref + "  ")
+            else:
+                self.logger.info(f"{pref}{k}: {v}")
 
     def log_model_summary(self, model: nn.Module):
         """Log model summary, architecture and size of the model.
