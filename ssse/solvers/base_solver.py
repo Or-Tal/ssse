@@ -140,9 +140,8 @@ class BaseSolver(ABC, flashy.BaseSolver):
     def log_to_wandb(self, training_stage, metrics, epoch):
         if self.cfg.logging.log_wandb:
             tmp = {}
-            for subset, metrics in metrics.items():
-                for k, v in metrics.items():
-                    tmp[f'{training_stage}_{k}'] = v
+            for k, v in metrics.items():
+                tmp[f'{training_stage}_{k}'] = v
 
             wandb.log(tmp, step=epoch)
 
