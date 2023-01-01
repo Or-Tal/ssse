@@ -137,13 +137,14 @@ class BaseSolver(ABC, flashy.BaseSolver):
                                                    formatter=self.get_formatter(stage_name))
         return restored_checkpoints
 
-    def log_to_wandb(self, training_stage, metrics, epoch):
+    def log_to_wandb(self):
         if self.cfg.logging.log_wandb:
             tmp = {}
-            for k, v in metrics.items():
-                tmp[f'{training_stage}_{k}'] = v
+            for subset, metrics in self._pending_metrics.items():
+                for k, v in metrics.items():
+                    tmp[f'{subset}_{k}'] = v
 
-            wandb.log(tmp, step=epoch)
+            wandb.log(tmp, step=self.epoch)
 
 
     def run(self):
@@ -161,19 +162,15 @@ class BaseSolver(ABC, flashy.BaseSolver):
             # Stages are used for automatic metric reporting to Dora, and it also
             # allows tuning how metrics are formatted.
             metrics = self.run_stage('train', self.train)
-            self.log_to_wandb('train', metrics, epoch)
 
             if self.should_run_stage('valid'):
                 metrics = self.run_stage('valid', self.valid)
-                self.log_to_wandb('valid', metrics, epoch)
 
             if self.should_run_stage('evaluate'):
                 metrics = self.run_stage('evaluate', self.evaluate)
-                self.log_to_wandb('evaluate', metrics, epoch)
 
             if self.should_run_stage('generate'):
                 metrics = self.run_stage('generate', self.generate)
-                self.log_to_wandb('generate', metrics, epoch)
 
             # Commit will send the metrics to Dora and save checkpoints by default.
             self.commit()
