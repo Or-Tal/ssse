@@ -109,14 +109,14 @@ class BaseSolver(ABC, flashy.BaseSolver):
         # This will increase self.epoch
         self.history.append(self._pending_metrics)
 
-        # log
-        if self.cfg.logging.log_wandb:
-            tmp = {}
-            for subset, metrics in self._pending_metrics.items():
-                for k, v in metrics.items():
-                    tmp[f'{subset}_{k}'] = v
+        # # log
+        # if self.cfg.logging.log_wandb:
+        #     tmp = {}
+        #     for subset, metrics in self._pending_metrics.items():
+        #         for k, v in metrics.items():
+        #             tmp[f'{subset}_{k}'] = v
 
-            wandb.log(tmp, step=self.epoch)
+        #     wandb.log(tmp, step=self.epoch)
 
         self._start_epoch()
         if flashy.distrib.is_rank_zero():
@@ -151,20 +151,16 @@ class BaseSolver(ABC, flashy.BaseSolver):
 
             # Stages are used for automatic metric reporting to Dora, and it also
             # allows tuning how metrics are formatted.
-            metrics = self.run_stage('train', self.train)
-            self._pending_metrics[f"train"] = metrics
+            self.run_stage('train', self.train)
 
             if self.should_run_stage('valid'):
                 metrics = self.run_stage('valid', self.valid)
-                self._pending_metrics[f"valid"] = metrics
 
             if self.should_run_stage('evaluate'):
-                metrics = self.run_stage('evaluate', self.evaluate)
-                self._pending_metrics[f"evaluate"] = metrics
+                self.run_stage('evaluate', self.evaluate)
 
             if self.should_run_stage('generate'):
-                metrics = self.run_stage('generate', self.generate)
-                self._pending_metrics[f"generate"] = metrics
+                self.run_stage('generate', self.generate)
 
             # Commit will send the metrics to Dora and save checkpoints by default.
             self.commit()
