@@ -1,0 +1,18 @@
+[
+    [
+        "/checkpoint/ortal1/Dsets/VCTK_16k/p225_001_mic1.wav",
+        32824
+    ],
+    [
+        "/checkpoint/ortal1/Dsets/VCTK_16k/p225_001_mic2.wav",
+        32824
+    ],
+    [
+        "/checkpoint/ortal1/Dsets/VCTK_16k/p225_002_mic1.wav",
+        63019
+    ],
+    [
+        "/checkpoint/ortal1/Dsets/VCTK_16k/p225_002_mic2.wav",
+        63019
+    ]
+]

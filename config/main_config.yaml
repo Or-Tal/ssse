@@ -4,6 +4,7 @@
 defaults:
   - _self_
   - dset: noisy
+  # - dset: noisy_debug
   - solver: solver_default
   - loss: se_loss
   - model: se_dual_ae

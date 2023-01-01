@@ -1,0 +1,38 @@
+# @package __global__
+# Author: Or Tal.
+
+# dataset related
+dset:
+  tr: /checkpoint/ortal1/Projects/ssse/egs/vctk_debug/tr.json
+  cv: /checkpoint/ortal1/Projects/ssse/egs/vctk_debug/cv.json
+  tt: /checkpoint/ortal1/Projects/ssse/egs/vctk_debug/tt.json
+  gen: 
+  sample_rate: 16000
+  channels: 1
+
+  dataset_class: noisy_dataset
+  dataloader_class: noisy_loader
+  sample_from_gaussian: False
+
+  # dataloader related
+  dataloader:
+    batch_size: 192
+    num_workers: 10
+    shuffle: True
+
+  eval_every:
+    valid: 1
+    evaluate: 5
+    generate: 
+
+  # noiser related
+  #noises: egs/demand/noises.json
+  noises: /checkpoint/ortal1/Projects/ssse/egs/demand/new_noises.json
+  snr_range: [10.0, 20.1, 0.5]  # [min, max, stride]
+  #snr_range: [1.0, 16.1, 0.5]  # [min, max, stride]
+  noises_for_test: ['PRESTO']
+  #noises_for_test: ['PRESTO', 'STRAFFIC']
+  # sample_from_gaussian: ${sample_from_gaussian}
+
+  # vad related
+  vad_file: /checkpoint/ortal1/Dsets/VCTK_16k_VAD/vad_results.npy
