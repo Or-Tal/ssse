@@ -117,5 +117,4 @@ if main.dora.shared is not None and not os.access(main.dora.shared, os.R_OK):
 
 
 if __name__ == '__main__':
-    print("")
     main()
