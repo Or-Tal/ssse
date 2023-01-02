@@ -30,11 +30,12 @@ tensorboard:
   sub_dir:  # optional sub directory to store tensorboard data
 
 wandb:
-  with_media_logging: false
-  project:  "SSSE"
-  name:  # optional name for the experiment
+  with_media_logging: true
+  project:  "SSL_SE"
+  name: # optional name for the experiment
   group:  # optional group
   entity: "ortal1"
+  reinit: true
 
 # SLURM launcher configuration.
 slurm:

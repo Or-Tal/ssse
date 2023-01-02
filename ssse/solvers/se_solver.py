@@ -154,25 +154,25 @@ class SESolver(BaseSolver):
         Method to log any information without running the job.
         """
         self.logger.info("Model:")
-        self.log_model_summary(self.model)
+        return self.log_model_summary(self.model)
 
     def train(self):
         """
         Train stage.
         """
-        self.common_train_valid_evaluate('train')
+        return self.common_train_valid_evaluate('train')
 
     def valid(self):
         """
         Valid stage.
         """
-        self.common_train_valid_evaluate('valid')
+        return self.common_train_valid_evaluate('valid')
 
     def evaluate(self):
         """
         Evaluate stage.
         """
-        self.common_train_valid_evaluate('evaluate')
+        return self.common_train_valid_evaluate('evaluate')
 
     def generate(self):
         """

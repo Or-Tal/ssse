@@ -155,33 +155,55 @@ class BaseSolver(ABC, flashy.BaseSolver):
 
             wandb.log(tmp, step=self.epoch)
 
+    def wandb_log(self, partitions_and_metrics, epoch):
+        if self.cfg.logging.log_wandb:
+            for partition, metrics in partitions_and_metrics.items():
+                wandb.log({f'{partition}_{k}': v for k, v in metrics.items()}, step=epoch)
+
 
     def run(self):
-        """Training loop.
+        """
+        Training loop.
         """
         assert len(self.state_dict()) > 0
         self.logger.info("Restoring checkpoint if such exist.")
         self.restore()  # load checkpoint and replay history
         self.logger.info("Training.")
+
+        # self.logger.info(f"writer: {self.result_logger._experiment_loggers['wandb'].writer}")
+        # self.logger.info(f"with_media_logging: {self.result_logger._experiment_loggers['wandb'].with_media_logging}")
         
         for epoch in range(self.epoch, self.cfg.solver.optim.epochs + 1):
             if self.should_stop_training():
                 return
-
+            # tmp = {}
             # Stages are used for automatic metric reporting to Dora, and it also
             # allows tuning how metrics are formatted.
-            metrics = self.run_stage('train', self.train)
+            self.run_stage('train', self.train)
+            # tmp['train'] = self.run_stage('train', self.train)
+            # self.result_logger._experiment_loggers['wandb'].log_metrics('train', metrics, epoch)
 
             if self.should_run_stage('valid'):
-                metrics = self.run_stage('valid', self.valid)
+                self.run_stage('valid', self.valid)
+                # tmp['valid'] = self.run_stage('valid', self.valid)
+                # self.result_logger._experiment_loggers['wandb'].log_metrics('valid', metrics, epoch)
 
             if self.should_run_stage('evaluate'):
-                metrics = self.run_stage('evaluate', self.evaluate)
+                self.run_stage('evaluate', self.evaluate)
+                # tmp['evaluate'] = self.run_stage('evaluate', self.evaluate)
+                # self.result_logger._experiment_loggers['wandb'].log_metrics('evaluate', metrics, epoch)
 
             if self.should_run_stage('generate'):
-                metrics = self.run_stage('generate', self.generate)
+                self.run_stage('generate', self.generate)
+                # tmp['generate'] = self.run_stage('generate', self.generate)
+                # self.result_logger._experiment_loggers['wandb'].log_metrics('generate', metrics, epoch)
 
             # Commit will send the metrics to Dora and save checkpoints by default.
+            # self.logger.info("tmp:")
+            # self.logger.info(str(tmp))
+            # self.logger.info("\n\npending metrics:")
+            # self.logger.info(str(self._pending_metrics))
+            # self.wandb_log(tmp, epoch)
             self.commit()
 
     def should_stop_training(self) -> bool:
