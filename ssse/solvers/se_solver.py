@@ -76,7 +76,9 @@ class SESolver(BaseSolver):
 
         losses = self.loss_function(outputs, noisy_sigs, vad_mask)
         loss = sum(losses)
-        metrics['reconst': losses[0], 'cont': losses[1], 'reg': losses[2]]
+        metrics['reconst'] = losses[0]
+        metrics['cont'] = losses[1]
+        metrics['reg'] = losses[2]
         if is_training:
             metrics['lr'] = self.optimizer.param_groups[0]['lr']
             self.optimize(loss)

@@ -24,8 +24,8 @@ def explorer(launcher):
             'loss.contrastive_factor': 1,
             'loss.noise_regularization_factor': 1,
             'wandb.name': f"hparam_search"}) 
-        for c_factor, reg_factor in product([0.05, 0.1, 0.3, 1, 2, 5, 10], [0.05, 0.1, 0.3, 1, 2, 5, 10]):
+        for c_factor, reg_factor, lr in product([0.05, 0.1, 0.3, 1, 2, 5, 10], [0.05, 0.1, 0.3, 1, 2, 5, 10], [1e-3, 7e-4, 3e-4, 1e-4, 7e-5, 3e-5, 1e-5]):
             sub({'loss.contrastive_factor': c_factor, 
                 'loss.noise_regularization_factor': reg_factor, 
-                'wandb.name': f"hparam_search_c{str(c_factor).replace('.', '_')}_reg{str(reg_factor).replace('.', '_')}",
+                'wandb.name': f"hparam_c_{str(c_factor).replace('.', '_')}_reg_{str(reg_factor).replace('.', '_')}_lr_{str(lr).replace('.', '_')}",
                 })

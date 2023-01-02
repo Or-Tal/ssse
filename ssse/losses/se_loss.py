@@ -158,6 +158,5 @@ class SupSELoss(SELoss):
         contrastive_loss = self.contrastive_loss(w_c, w_n, vad_mask, device) if self.include_contrastive else 0
         reg_loss = self.regularization_loss(vad_mask, z_hat, noisy_sigs) if self.include_regularization else 0
 
-        return self.reconstruction_factor * reconstruction_loss + self.contrastive_factor * contrastive_loss + \
-               self.noise_regularization_factor * reg_loss
+        return [self.reconstruction_factor * reconstruction_loss, self.contrastive_factor * contrastive_loss, self.noise_regularization_factor * reg_loss]
 
