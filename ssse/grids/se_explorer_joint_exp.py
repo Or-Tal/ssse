@@ -18,7 +18,7 @@ def explorer(launcher):
         'loss.loss_name': 'se_loss',
         'loss.reconstruction_factor' : 1,
         'loss.contrastive_factor' : 10,
-        'loss.noise_regularization_factor' : 1,
+        'loss.noise_regularization_factor' : 10,
     })
 
     with launcher.job_array():
