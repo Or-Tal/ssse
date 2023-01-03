@@ -12,7 +12,7 @@ def explorer(launcher):
         'solver': 'solver_default',
         'dset.dataloader.batch_size': 96,
         'solver.optim.epochs': 400,
-        'model.model_class_name': 'demucs_joint_ae',
+        'model.model_class_name': 'se_dual_ae_joint_enc',
         'solver.solver': 'se',
         'loss.loss_name': 'se_loss',
         'loss.reconstruction_factor' : 1,

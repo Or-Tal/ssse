@@ -1,9 +1,9 @@
 # Author: Or Tal
 import omegaconf
 import torch. nn as nn
-from .demucs_ae import DemucsConfig, DemucsDecoder, DemucsDoubleAEwJointEncoder, DemucsEncoder
+from .demucs_ae import DemucsConfig, DemucsDecoder, DemucsEncoder, DemucsJointEncoder
 from magma.utils.utils import dict_from_config
-from .dual_ae import DualAE
+from .dual_ae import DualAE, DualAEJointEncoder
 from .feature_encoder import FeatureEncoderBLSTM
 from .hifi_gan_generator import HifiGanGenerator, HifiGeneratorConfig
 from .wav2vec2_encoder import Wav2vec2Encoder
@@ -14,7 +14,7 @@ _supported_modules = {
     'wav2vec_encoder': Wav2vec2Encoder,
     'hifi_gan_generator': HifiGanGenerator,
     'blstm_feature': FeatureEncoderBLSTM,
-    'demucs_joint_ae': DemucsDoubleAEwJointEncoder,
+    'demucs_joint_encoder': DemucsJointEncoder,
 }
 
 _supported_configs = {
@@ -37,6 +37,11 @@ def model_factory(cfg: omegaconf.DictConfig, model_class_name: str) -> nn.Module
         decoder = model_factory(cfg, cfg.model.decoder_model)
         feature_model = model_factory(cfg, cfg.model.feature_model)
         return DualAE(encoders, decoder, feature_model, cfg.model.include_skips_in_fw_pass)
+    elif model_class_name.lower() == "se_dual_ae_joint_enc":
+        encoder = model_factory(cfg, cfg.model.encoder_model), model_factory(cfg, cfg.model.encoder_model)
+        decoder = model_factory(cfg, cfg.model.decoder_model)
+        feature_model = model_factory(cfg, cfg.model.feature_model)
+        return DualAEJointEncoder(encoder, decoder, feature_model, cfg.model.include_skips_in_fw_pass)
     elif model_class_name.lower() in _supported_modules.keys():
         return _supported_modules[model_class_name.lower()](create_config(cfg.model, model_class_name.lower()))
     else:

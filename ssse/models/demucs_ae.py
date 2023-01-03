@@ -338,55 +338,6 @@ class DemucsJointEncoder(DemucsEncoder):
         super().__init__(args)
 
 
-class DemucsDoubleAEwJointEncoder(nn.Module):
-
-    def __init__(self, args: DemucsConfig):
-        super().__init__()
-        self.decoder = DemucsDecoder(args)
-        self.ft_enc = FeatureEncoderBLSTM(args)
-        self.enc = DemucsJointEncoder(args)
-
-    def infer(self, mix):
-        with torch.no_grad():
-            _, _, y_hat, z_hat, _, _ = self.forward(mix)
-        return y_hat, z_hat
-
-
-    def valid_length(self, length):
-        return self.encoder.valid_length(length)
-    
-    @staticmethod
-    def split_to_noisy_clean(ls, skips):
-        # ls: {Batch, Ft, T}
-        # skips: [{Batch, Ft, T}]
-        
-        def split_single_val(val):
-            b, ft, _ = val.shape
-            val = val.reshape((b, ft, -1, 2))
-            return val[..., 0], val[...,1]
-        
-        l_c, l_n = split_single_val(ls)
-        skips_c, skips_n = [], []
-        for s in skips:
-            s_c, s_n = split_single_val(s)
-            skips_c.append(s_c)
-            skips_n.append(s_n)
-        
-        return l_c, l_n, skips_c, skips_n
-
-
-    def forward(self, mix, eval=False):
-        ls, skips, std, length = self.encoder_c(mix, include_skips=True, include_std_len=True)
-        l_c, l_n, skips_c, skips_n = self.split_to_noisy_clean(ls, skips)
-        y_hat = self.decoder(l_c, [s for s in skips_c], std, length)
-        if eval:
-            return y_hat
-
-        z_hat = self.decoder(l_n, [s for s in skips_n], std, length)
-
-        return l_c, l_n, y_hat, z_hat, self.ft_enc(l_c), self.ft_enc(l_n)
-
-
 class DemucsDoubleAE(nn.Module):
 
     def __init__(self, args: DemucsConfig, mutual_enc_layers=0):
