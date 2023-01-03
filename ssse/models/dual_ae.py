@@ -56,9 +56,9 @@ class DualAEJointEncoder(nn.Module):
         # skips: [{Batch, Ft, T}]
         
         def split_single_val(val):
-            b, ft, _ = val.shape
-            val = val.reshape((b, ft, -1, 2))
-            return val[..., 0], val[...,1]
+            b, _, t = val.shape
+            val = val.reshape((b, -1, 2, t))
+            return val[..., 0, :], val[..., 1, :]
         
         l_c, l_n = split_single_val(ls)
         skips_c, skips_n = [], []
