@@ -39,7 +39,7 @@ class DualAEJointEncoder(nn.Module):
         super().__init__()
         self.decoder = decoder
         self.ft_enc = ft_encoder
-        self.enc = encoder
+        self.encoder = encoder
 
     def infer(self, mix):
         with torch.no_grad():
@@ -71,7 +71,7 @@ class DualAEJointEncoder(nn.Module):
 
 
     def forward(self, mix, eval=False):
-        ls, skips, std, length = self.encoder_c(mix, include_skips=True, include_std_len=True)
+        ls, skips, std, length = self.encoder(mix, include_skips=True, include_std_len=True)
         l_c, l_n, skips_c, skips_n = self.split_to_noisy_clean(ls, skips)
         y_hat = self.decoder(l_c, [s for s in skips_c], std, length)
         if eval:
