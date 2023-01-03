@@ -1,7 +1,7 @@
 # Author: Or Tal
 import omegaconf
 import torch. nn as nn
-from .demucs_ae import DemucsConfig, DemucsDecoder, DemucsEncoder
+from .demucs_ae import DemucsConfig, DemucsDecoder, DemucsDoubleAEwJointEncoder, DemucsEncoder
 from magma.utils.utils import dict_from_config
 from .dual_ae import DualAE
 from .feature_encoder import FeatureEncoderBLSTM
@@ -14,6 +14,7 @@ _supported_modules = {
     'wav2vec_encoder': Wav2vec2Encoder,
     'hifi_gan_generator': HifiGanGenerator,
     'blstm_feature': FeatureEncoderBLSTM,
+    'demucs_joint_ae': DemucsDoubleAEwJointEncoder,
 }
 
 _supported_configs = {
