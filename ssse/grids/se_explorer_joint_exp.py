@@ -13,6 +13,7 @@ def explorer(launcher):
         'dset.dataloader.batch_size': 96,
         'solver.optim.epochs': 400,
         'model.model_class_name': 'se_dual_ae_joint_enc',
+        'model.encoder_model': 'demucs_joint_encoder',
         'solver.solver': 'se',
         'loss.loss_name': 'se_loss',
         'loss.reconstruction_factor' : 1,

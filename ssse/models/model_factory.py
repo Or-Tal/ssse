@@ -38,7 +38,7 @@ def model_factory(cfg: omegaconf.DictConfig, model_class_name: str) -> nn.Module
         feature_model = model_factory(cfg, cfg.model.feature_model)
         return DualAE(encoders, decoder, feature_model, cfg.model.include_skips_in_fw_pass)
     elif model_class_name.lower() == "se_dual_ae_joint_enc":
-        encoder = model_factory(cfg, cfg.model.encoder_model), model_factory(cfg, cfg.model.encoder_model)
+        encoder = model_factory(cfg, cfg.model.encoder_model)
         decoder = model_factory(cfg, cfg.model.decoder_model)
         feature_model = model_factory(cfg, cfg.model.feature_model)
         return DualAEJointEncoder(encoder, decoder, feature_model, cfg.model.include_skips_in_fw_pass)
