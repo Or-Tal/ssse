@@ -1,4 +1,4 @@
-from se_loss import *
+from .se_loss import *
 
 class NaiveSELoss(SELoss):
 
