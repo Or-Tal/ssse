@@ -1,4 +1,4 @@
-from magma.magma.quantization.vq import ResidualVectorQuantizer
+from magma.quantization.vq import ResidualVectorQuantizer
 import torch.nn as nn
 
 class RVQ(nn.Module):
