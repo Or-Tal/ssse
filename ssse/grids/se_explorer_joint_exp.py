@@ -10,7 +10,8 @@ def explorer(launcher):
     launcher.slurm_(gpus=4, partition='devlab', cpus_per_gpu=1, time=2880, comment='exp_joint_rvq_v0')
     launcher.bind_({
         'solver': 'solver_default',
-        'dset.dataloader.batch_size': 96,
+        'dset.dataloader.batch_size': 64,
+        # 'dset.dataloader.batch_size': 96,
         'solver.optim.epochs': 400,
         'model.model_class_name': 'se_dual_ae_joint_enc',
         'model.encoder_model': 'demucs_joint_encoder',
