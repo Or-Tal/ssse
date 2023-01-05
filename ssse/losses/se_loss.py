@@ -130,17 +130,7 @@ class SELoss(nn.Module):
 
         return [self.reconstruction_factor * reconstruction_loss, self.contrastive_factor * contrastive_loss, self.noise_regularization_factor * reg_loss]
 
-class SELossNaive(SELoss):
 
-    def single_sample_contrastive_loss(self, w_c, w_n, vad_mask):
-        # w_c.shape = w_n.shape = (T, Ft)
-        pass
-
-
-    def contrastive_loss(self, w_c, w_n, vad_mask, device):
-        # permute for simplicity
-        w_c = w_c.permute((0, 2, 1))  # batch x T x Ft
-        w_n = w_n.permute((0, 2, 1))  # batch x T x Ft
 
 class SupSELoss(SELoss):
 

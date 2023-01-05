@@ -24,9 +24,10 @@ def explorer(launcher):
     })
 
     with launcher.job_array():
-        sub = launcher.bind({'loss.include_contrastive': True, 'dset.sample_from_gaussian': True, 'wandb.name': f"joint_rvq"}) 
-        for cont, gaussian in product([True, False], [True, False]):
+        sub = launcher.bind({'loss.include_contrastive': True, 'dset.sample_from_gaussian': True, 
+        'wandb.name': f"joint_rvq", 'model.include_quantizer': True}) 
+        for cont, gaussian, rvq in product([True, False], [True, False], [True, False]):
             sub({'loss.include_contrastive': cont, 
                 'dset.sample_from_gaussian': gaussian, 
-                'wandb.name': f"joint_rvq_c{int(cont)}_g{int(gaussian)}",
+                'wandb.name': f"joint{'_rvq' if rvq else ''}_c_{int(cont)}_g_{int(gaussian)}",
             })

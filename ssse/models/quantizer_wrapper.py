@@ -4,6 +4,7 @@ import torch.nn as nn
 class RVQ(nn.Module):
 
     def __init__(self, quantizer_args, sample_rate=16000):
+        super().__init__()
         self.sample_rate = sample_rate
         self.quantizer = ResidualVectorQuantizer(**quantizer_args)
     
