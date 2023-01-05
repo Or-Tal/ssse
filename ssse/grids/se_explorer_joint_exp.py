@@ -16,7 +16,7 @@ def explorer(launcher):
         'model.model_class_name': 'se_dual_ae_joint_enc',
         'model.encoder_model': 'demucs_joint_encoder',
         'solver.solver': 'se',
-        'loss.loss_name': 'se_loss',
+        'loss.loss_name': 'naive_se_loss',
         'loss.reconstruction_factor' : 1,
         'loss.contrastive_factor' : 1,
         'loss.noise_regularization_factor' : 10,
@@ -26,9 +26,9 @@ def explorer(launcher):
 
     with launcher.job_array():
         sub = launcher.bind({'loss.include_contrastive': True, 'dset.sample_from_gaussian': True, 
-        'wandb.name': f"joint_rvq", 'model.include_quantizer': True}) 
+        'wandb.name': f"naive_loss_joint_rvq", 'model.include_quantizer': True}) 
         for cont, gaussian, rvq in product([True, False], [True, False], [True, False]):
             sub({'loss.include_contrastive': cont, 
                 'dset.sample_from_gaussian': gaussian, 
-                'wandb.name': f"joint{'_rvq' if rvq else ''}_c_{int(cont)}_g_{int(gaussian)}",
+                'wandb.name': f"naive_loss_joint{'_rvq' if rvq else ''}_c_{int(cont)}_g_{int(gaussian)}",
             })

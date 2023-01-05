@@ -3,11 +3,13 @@
 import omegaconf
 import torch.nn as nn
 
+from ssse.losses.naive_se_loss import NaiveSELoss
 from .se_loss import SELoss, SupSELoss
 
 _supported_losses = {
     'se_loss': SELoss,
     'sup_se_loss': SupSELoss,
+    'noive_se_loss': NaiveSELoss,
 }
 
 

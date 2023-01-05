@@ -1,7 +1,7 @@
 # @package __global__
 # Author: Or Tal.
 loss:
-  loss_name: se_loss # or sup_se_loss
+  loss_name: se_loss # in sup_se_loss/sup_se_loss/naive_se_loss
 
   just_reconstruction: False
   reconstruction_factor: 0.1
