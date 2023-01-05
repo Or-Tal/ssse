@@ -9,4 +9,4 @@ class RVQ(nn.Module):
         self.quantizer = ResidualVectorQuantizer(**quantizer_args)
     
     def forward(self, x):
-        return self.quantizer.forward(x, self.sample_rate)
+        return self.quantizer.forward(x, self.sample_rate).x
