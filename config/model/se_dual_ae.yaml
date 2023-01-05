@@ -52,6 +52,6 @@ model:
     kmeans_init: true
     kmeans_iter: 10
     threshold_ema_dead_code: 2
-    threshold_ema_dead_code: 0.0
+    orthogonal_reg_weight: 0.0
     orthogonal_reg_active_codes_only: false
     orthogonal_reg_max_codes: # optional, leave blank for default = None
