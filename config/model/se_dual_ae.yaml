@@ -50,7 +50,7 @@ model:
     bins: 1024
     decay: 0.99
     kmeans_init: true
-    kmeans_iter: 10
+    kmeans_iters: 10
     threshold_ema_dead_code: 2
     orthogonal_reg_weight: 0.0
     orthogonal_reg_active_codes_only: false
