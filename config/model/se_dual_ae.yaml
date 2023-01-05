@@ -39,3 +39,19 @@ model:
   feature_encoder:
     window_size: 5
     hidden_size: 512
+  
+  include_quantizer: false
+  quantizer_name: rvq
+
+  rvq:
+    dimension: 256
+    n_q: 8
+    q_dropout: false
+    bins: 1024
+    decay: 0.99
+    kmeans_init: true
+    kmeans_iter: 10
+    threshold_ema_dead_code: 2
+    threshold_ema_dead_code: 0.0
+    orthogonal_reg_active_codes_only: false
+    orthogonal_reg_max_codes: # optional, leave blank for default = None

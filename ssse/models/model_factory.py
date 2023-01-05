@@ -1,6 +1,8 @@
 # Author: Or Tal
 import omegaconf
 import torch. nn as nn
+
+from ssse.models.quantizer_wrapper import RVQ
 from .demucs_ae import DemucsConfig, DemucsDecoder, DemucsEncoder, DemucsJointEncoder
 from magma.utils.utils import dict_from_config
 from .dual_ae import DualAE, DualAEJointEncoder
@@ -15,6 +17,7 @@ _supported_modules = {
     'hifi_gan_generator': HifiGanGenerator,
     'blstm_feature': FeatureEncoderBLSTM,
     'demucs_joint_encoder': DemucsJointEncoder,
+    'rvq': RVQ,
 }
 
 _supported_configs = {
@@ -40,8 +43,13 @@ def model_factory(cfg: omegaconf.DictConfig, model_class_name: str) -> nn.Module
     elif model_class_name.lower() == "se_dual_ae_joint_enc":
         encoder = model_factory(cfg, cfg.model.encoder_model)
         decoder = model_factory(cfg, cfg.model.decoder_model)
+        if cfg.model.include_quantizer:
+            quantizer_class = _supported_modules[cfg.model.quantizer_name.lower()]
+            quantizer = quantizer_class(getattr(cfg.model, cfg.model.quantizer_name), sample_rate=cfg.dset.sample_rate)
+        else:
+            quantizer = None
         feature_model = model_factory(cfg, cfg.model.feature_model)
-        return DualAEJointEncoder(encoder, decoder, feature_model, cfg.model.include_skips_in_fw_pass)
+        return DualAEJointEncoder(encoder, decoder, feature_model, quantizer, cfg.model.include_skips_in_fw_pass)
     elif model_class_name.lower() in _supported_modules.keys():
         return _supported_modules[model_class_name.lower()](create_config(cfg.model, model_class_name.lower()))
     else:

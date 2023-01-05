@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 import torch.nn as nn
 import torch
 
@@ -35,11 +35,14 @@ class DualAE(nn.Module):
 
 class DualAEJointEncoder(nn.Module):
 
-    def __init__(self, encoder: nn.Module, decoder: nn.Module, ft_encoder: nn.Module, include_skips_in_fw = True):
+    def __init__(self, encoder: nn.Module, decoder: nn.Module, ft_encoder: nn.Module, 
+                 quantizer: Union[None, nn.Module], include_skips_in_fw = True):
+
         super().__init__()
         self.decoder = decoder
         self.ft_enc = ft_encoder
         self.encoder = encoder
+        self.quantizer = quantizer
 
     def infer(self, mix):
         with torch.no_grad():
@@ -73,10 +76,13 @@ class DualAEJointEncoder(nn.Module):
     def forward(self, mix, eval=False):
         ls, skips, std, length = self.encoder(mix, include_skips=True, include_std_len=True)
         l_c, l_n, skips_c, skips_n = self.split_to_noisy_clean(ls, skips)
+        if self.quantizer is not None:
+            l_c = self.quantizer(l_c)
         y_hat = self.decoder(l_c, [s for s in skips_c], std, length)
         if eval:
             return y_hat
-
+        if self.quantizer is not None:
+            l_n = self.quantizer(l_n)
         z_hat = self.decoder(l_n, [s for s in skips_n], std, length)
 
         return l_c, l_n, y_hat, z_hat, self.ft_enc(l_c), self.ft_enc(l_n)

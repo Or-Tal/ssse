@@ -8,7 +8,7 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "module": "${file}",
+            "module": "/checkpoint/ortal1/Projects/ssse/ssse/train",
             "console": "integratedTerminal",
             "justMyCode": true
         }
