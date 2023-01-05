@@ -44,7 +44,7 @@ model:
   quantizer_name: rvq
 
   rvq:
-    dimension: 256
+    dimension: 768
     n_q: 8
     q_dropout: false
     bins: 1024
