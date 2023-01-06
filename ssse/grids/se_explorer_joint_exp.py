@@ -27,12 +27,12 @@ def explorer(launcher):
 
     with launcher.job_array():
         sub = launcher.bind({'loss.include_contrastive': True, 'dset.sample_from_gaussian': True, 
-        'wandb.name': f"naive_loss_joint_rvq", 'model.include_quantizer': True}) 
+        'wandb.name': f"naive_joint_rvq", 'model.include_quantizer': True}) 
         for cont, gaussian, rvq in product([True, False], [True, False], [True, False]):
             sub({'loss.include_contrastive': cont, 
                 'dset.sample_from_gaussian': gaussian, 
                 'model.include_quantizer': rvq,
-                'wandb.name': f"naive_loss_joint{'_rvq' if rvq else ''}_c_{int(cont)}_g_{int(gaussian)}",
+                'wandb.name': f"naive_joint{'_rvq' if rvq else ''}_c_{int(cont)}_g_{int(gaussian)}",
             })
         # for cont, rvq in product([True, False], [True, False]):
         #     sub({'loss.include_contrastive': cont,
