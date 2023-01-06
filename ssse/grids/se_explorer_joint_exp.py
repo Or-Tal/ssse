@@ -21,7 +21,8 @@ def explorer(launcher):
         'loss.contrastive_factor' : 1,
         'loss.noise_regularization_factor' : 10,
         'model.include_quantizer': True,
-        'model.quantizer_name': 'rvq'
+        'model.quantizer_name': 'rvq',
+        # 'dset.sample_from_gaussian': True,
     })
 
     with launcher.job_array():
@@ -33,3 +34,8 @@ def explorer(launcher):
                 'model.include_quantizer': rvq,
                 'wandb.name': f"naive_loss_joint{'_rvq' if rvq else ''}_c_{int(cont)}_g_{int(gaussian)}",
             })
+        # for cont, rvq in product([True, False], [True, False]):
+        #     sub({'loss.include_contrastive': cont,
+        #         'model.include_quantizer': rvq,
+        #         'wandb.name': f"naive_loss_joint{'_rvq' if rvq else ''}_c_{int(cont)}_g_1",
+        #     })
