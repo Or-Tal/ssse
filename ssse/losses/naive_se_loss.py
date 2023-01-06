@@ -18,6 +18,9 @@ class NaiveSELoss(SELoss):
                 for w in tmp:
                     divisor = divisor + torch.exp(self.f(w_c[i], w))
                 divisors.append(divisor)
+        if len(denominators) == 0 or len(divisors) == 0:
+            print("0 was returned from single sample contrastive loss")
+            return 0
         denominators = torch.stack(denominators, dim=0)
         divisors = torch.stack(divisors, dim=0)
         return - torch.mean(torch.log(denominators / (divisors + EPS)))
