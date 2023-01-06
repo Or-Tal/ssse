@@ -22,6 +22,7 @@ def explorer(launcher):
         'loss.noise_regularization_factor' : 10,
         'model.include_quantizer': True,
         'model.quantizer_name': 'rvq',
+        'label': 're_init_exps_v_0_0',
         # 'dset.sample_from_gaussian': True,
     })
 
