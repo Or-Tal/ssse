@@ -9,7 +9,8 @@ class NaiveSELoss(SELoss):
         denominators = []
         divisors = []
         for i in range(len(w_c)-1):
-            if vad_mask[i] and vad_mask[i+1]:
+            if vad_mask[i]:
+            # if vad_mask[i] and vad_mask[i+1]:
                 denom = torch.exp(self.f(w_c[i], w_c[i+1]))
                 denominators.append(denom)
                 tmp = w_n[torch.randperm(w_n.shape[0])][:NEG_SIZE]
@@ -33,9 +34,11 @@ class NaiveSELoss(SELoss):
         # print(f"w_c: {w_c.shape}")
         # print(f"w_n: {w_n.shape}")
         # print("----------------")
-
+        if True not in vad_mask:
+            print("return 0 from contrastive loss")
+            return 0
         results = torch.tensor([
-            self.single_sample_contrastive_loss(w_c_i, w_n_i, vad_mask_i) for w_c_i, w_n_i, vad_mask_i in zip(w_c, w_n, vad_mask)
+            self.single_sample_contrastive_loss(w_c_i, w_n_i, vad_mask_i) for w_c_i, w_n_i, vad_mask_i in zip(w_c, w_n, vad_mask) if True in vad_mask_i
         ])
 
         return torch.mean(results)
