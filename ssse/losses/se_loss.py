@@ -23,9 +23,23 @@ class SELoss(nn.Module):
         self.mse = nn.MSELoss(reduction='none')
         self.include_regularization = loss_cfg.include_regularization
         self.include_contrastive = loss_cfg.include_contrastive
+        self.window_size = loss_cfg.window_size
 
     def f(self, a, b):
         return 1 + F.cosine_similarity(a, b, -1)
+    
+    def match_vad_to_windows(self, vad_mask, device):
+        # print(f"vad: {vad_mask.shape}")
+        num_windows = vad_mask.shape[-1] // self.window_size
+        n = num_windows * self.window_size
+        mask = vad_mask[..., :n].float()
+        # print(f"mask: {vad_mask.shape}")
+        mask_windows = [torch.sum(vad_mask[..., i:i+self.window_size], dim=-1) for i in range(0, n+1, self.window_size)]
+        # print(f"mask_windows -> len: {len(mask_windows)}, inner: {mask_windows[0].shape}")
+        mask = torch.stack(mask_windows, dim=-1)
+        # print(f"concatenated mask: {mask.shape}")
+        mask = mask > (self.window_size/2)
+        return mask.to(device)
 
     def get_divisors(self, w_c, w_n, vad_mask, denoms=None):
         neg_dots = torch.sum(torch.exp(self.f(w_c, w_n)) * vad_mask, dim=-1)

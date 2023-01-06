@@ -11,3 +11,4 @@ loss:
   stft_mag_factor: 0.1
   include_regularization: True
   include_contrastive: True
+  window_size: ${model.feature_encoder.window_size}
