@@ -26,7 +26,6 @@ class NaiveSELoss(SELoss):
         # permute for simplicity
         w_c = w_c.permute((0, 2, 1))  # batch x T x Ft
         w_n = w_n.permute((0, 2, 1))  # batch x T x Ft
-        vad_mask_windows = self.match_vad_to_windows(vad_mask, device)
 
         # # print sizes for debugging
         # print("---- sizes ----")
@@ -36,7 +35,7 @@ class NaiveSELoss(SELoss):
         # print("----------------")
 
         results = torch.tensor([
-            self.single_sample_contrastive_loss(w_c_i, w_n_i, vad_mask_i) for w_c_i, w_n_i, vad_mask_i in zip(w_c, w_n, vad_mask_windows)
+            self.single_sample_contrastive_loss(w_c_i, w_n_i, vad_mask_i) for w_c_i, w_n_i, vad_mask_i in zip(w_c, w_n, vad_mask)
         ])
 
         return torch.mean(results)

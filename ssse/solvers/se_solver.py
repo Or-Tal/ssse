@@ -83,6 +83,7 @@ class SESolver(BaseSolver):
             metrics['lr'] = self.optimizer.param_groups[0]['lr']
             self.optimize(loss)
         metrics['tot_loss'] = loss
+        metrics['epoch'] = self.epoch
 
         return metrics
 

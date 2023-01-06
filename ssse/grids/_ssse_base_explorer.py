@@ -27,14 +27,20 @@ class SsseBaseExplorer(BaseExplorer):
                 "train",
                 [
                     tt.leaf("epoch"),
-                    tt.leaf("loss", ".4f"),  # total loss
+                    tt.leaf("tot_loss", ".4f"),  # total loss
+                    tt.leaf("reconst", ".4f"),  # total loss
+                    tt.leaf("cont", ".4f"),  # total loss
+                    tt.leaf("reg", ".4f"),  # total loss
                 ],
                 align=">",
             ),
             tt.group(
                 "valid",
                 [
-                    tt.leaf("loss", ".4f"),
+                    tt.leaf("tot_loss", ".4f"),
+                    tt.leaf("reconst", ".4f"),  # total loss
+                    tt.leaf("cont", ".4f"),  # total loss
+                    tt.leaf("reg", ".4f"),  # total loss
                 ],
                 align=">",
             ),
