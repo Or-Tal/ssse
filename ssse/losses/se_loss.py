@@ -41,13 +41,13 @@ class SELoss(nn.Module):
         mask = mask > (self.window_size/2)
         return mask.to(device)
 
-    def get_divisors(self, w_c, w_n, vad_mask, denoms=None):
+    def get_divisors(self, w_c, w_n, denoms=None):
         # init list of negative dot products, each of shape: (B, T, Ft)
         # after the similarity function (f): (B, T)
         neg_dots = [denoms + EPS, torch.exp(self.f(w_c, w_n))] if denoms is not None else [torch.exp(self.f(w_c, w_n))]
         for _ in range(NEG_SIZE - 1):
             perm = torch.randperm(w_n.shape[1])
-            neg_dots.append(torch.exp(self.f(w_c, w_n[..., perm])))
+            neg_dots.append(torch.exp(self.f(w_c, w_n[:, perm])))
         
         # stack all denominators (calculated similarities permutations w.r.t w_c)
         neg_dots = torch.stack(neg_dots, dim=-1) # shape: (B, T, NEG_SIZE + 1 (or NEG_SIZE if denoms is None))
@@ -84,7 +84,7 @@ class SELoss(nn.Module):
         denominators = torch.exp(self.f(w_ci, w_cip1)) * shrinked_vad[..., :-1] # shape: (B, T)
 
         # calculate divisor factors
-        divisors = self.get_divisors(w_c, w_n, vad_mask, denoms=denominators) # shape: (B, T)
+        divisors = self.get_divisors(w_c, w_n, denoms=denominators) # shape: (B, T)
 
         N = torch.sum(shrinked_vad, dim=-1)
 
