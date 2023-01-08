@@ -42,20 +42,20 @@ class SELoss(nn.Module):
         return mask.to(device)
 
     def get_divisors(self, w_c, w_n, vad_mask, denoms=None):
-        neg_dots = torch.sum(torch.exp(self.f(w_c, w_n)) * vad_mask, dim=-1)
+        # init list of negative dot products, each of shape: (B, T, Ft)
+        # after the similarity function (f): (B, T)
+        neg_dots = [denoms + EPS, torch.exp(self.f(w_c, w_n))] if denoms is not None else [torch.exp(self.f(w_c, w_n))]
         for _ in range(NEG_SIZE - 1):
             perm = torch.randperm(w_n.shape[1])
-            neg_dots = neg_dots + torch.sum(torch.exp(self.f(w_c, w_n[:, perm])) * vad_mask[:, perm], dim=-1)
-        if denoms is not None:
-            # print(f"denoms: {denoms.shape}\nneg_dots: {neg_dots.shape}")
-            flag = len(denoms.shape) == 2
-            if flag:
-                neg_dots = neg_dots.unsqueeze(1)
-            neg_dots = (denoms + neg_dots.expand_as(denoms)) if flag else denoms + neg_dots
-                
-        neg_dots = neg_dots / NEG_SIZE
+            neg_dots.append(torch.exp(self.f(w_c, w_n[..., perm])))
+        
+        # stack all denominators (calculated similarities permutations w.r.t w_c)
+        neg_dots = torch.stack(neg_dots, dim=-1) # shape: (B, T, NEG_SIZE + 1 (or NEG_SIZE if denoms is None))
 
-        return 1 / (neg_dots + EPS)
+        # sum 
+        neg_dots = torch.sum(neg_dots, dim=-1)
+
+        return 1 / neg_dots
     
 
     def contrastive_loss(self, w_c, w_n, vad_mask, device):
@@ -63,32 +63,35 @@ class SELoss(nn.Module):
         w_c = w_c.permute((0, 2, 1))  # batch x T x Ft
         w_n = w_n.permute((0, 2, 1))  # batch x T x Ft
 
-        vad_mask = vad_mask.to(float)
+        # match vad to windows
+        shrinked_vad = self.match_vad_to_windows(vad_mask, device)
+
+        shrinked_vad = shrinked_vad.to(float)
         # TODO: is + eps really necessary?
-        vad_mask = vad_mask + EPS
+        # shrinked_vad = shrinked_vad + EPS
 
         # TODO: remove limitation of length to vad (n < 0) and uncomment line 34
-        n = w_c.shape[1] - vad_mask.shape[-1]
+        n = w_c.shape[1] - shrinked_vad.shape[-1]
         # n = max(w_c.shape[1] - vad_mask.shape[-1], 0)
         if n > 0:
-            vad_mask = torch.cat([vad_mask, torch.zeros((vad_mask.shape[0], n), device=device)], dim=-1)
+            shrinked_vad = torch.cat([shrinked_vad, torch.zeros((vad_mask.shape[0], n), device=device)], dim=-1)
         elif n < 0:
-            vad_mask = vad_mask[..., :w_c.shape[1]]
-        w_c = w_c * vad_mask.unsqueeze(2).expand_as(w_c)
+            shrinked_vad = shrinked_vad[..., :w_c.shape[1]]
+        w_c = w_c * shrinked_vad.unsqueeze(2).expand_as(w_c)
         w_ci, w_cip1 = w_c[:, :-1, :], w_c[:, 1:, :]
 
         # calculate denominators
-        denominators = torch.exp(self.f(w_ci, w_cip1)) * vad_mask[..., :-1]
+        denominators = torch.exp(self.f(w_ci, w_cip1)) * shrinked_vad[..., :-1] # shape: (B, T)
 
         # calculate divisor factors
-        divisors = self.get_divisors(w_c, w_n, vad_mask, denoms=denominators)
+        divisors = self.get_divisors(w_c, w_n, vad_mask, denoms=denominators) # shape: (B, T)
 
-        N = torch.count_nonzero(vad_mask, dim=-1)
+        N = torch.sum(shrinked_vad, dim=-1)
 
         # calculate loss terms
         if divisors.shape != denominators.shape:
             divisors = divisors.unsqueeze(-1).expand_as(denominators)
-        terms = torch.sum(- torch.log(EPS + denominators * divisors) * vad_mask[..., :-1], dim=-1)
+        terms = torch.sum(- torch.log(denominators * divisors), dim=-1)
         terms = terms / N
 
         return torch.mean(terms)
