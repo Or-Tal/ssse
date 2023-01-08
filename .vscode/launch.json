@@ -5,12 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Python: Module",
             "type": "python",
             "request": "launch",
-            "module": "/checkpoint/ortal1/Projects/ssse/ssse/train",
+            "module": "ssse",
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": false,
+            "env": {"PYTHONPATH": ".:${PYTHONPATH}"}
         }
     ]
 }

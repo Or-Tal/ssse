@@ -34,7 +34,7 @@ class SELoss(nn.Module):
         n = num_windows * self.window_size
         mask = vad_mask[..., :n].float()
         # print(f"mask: {vad_mask.shape}")
-        mask_windows = [torch.sum(vad_mask[..., i:i+self.window_size], dim=-1) for i in range(0, n+1, self.window_size)]
+        mask_windows = [torch.sum(vad_mask[..., i:i+self.window_size], dim=-1) for i in range(0, n - self.window_size + 1, self.window_size)]
         # print(f"mask_windows -> len: {len(mask_windows)}, inner: {mask_windows[0].shape}")
         mask = torch.stack(mask_windows, dim=-1)
         # print(f"concatenated mask: {mask.shape}")
@@ -70,6 +70,15 @@ class SELoss(nn.Module):
         # match vad to windows
         shrinked_vad = self.match_vad_to_windows(vad_mask, device)
 
+
+    def contrastive_loss_old(self, w_c, w_n, vad_mask, device):
+        # permute for simplicity
+        w_c = w_c.permute((0, 2, 1))  # batch x T x Ft
+        w_n = w_n.permute((0, 2, 1))  # batch x T x Ft
+
+        # match vad to windows
+        shrinked_vad = self.match_vad_to_windows(vad_mask, device)
+
         shrinked_vad = shrinked_vad.to(float)
         # TODO: is + eps really necessary?
         # shrinked_vad = shrinked_vad + EPS
@@ -81,7 +90,7 @@ class SELoss(nn.Module):
             shrinked_vad = torch.cat([shrinked_vad, torch.zeros((vad_mask.shape[0], n), device=device)], dim=-1)
         elif n < 0:
             shrinked_vad = shrinked_vad[..., :w_c.shape[1]]
-        w_c = w_c * shrinked_vad.unsqueeze(2).expand_as(w_c)
+        # w_c = w_c * shrinked_vad.unsqueeze(2).expand_as(w_c)
         w_ci, w_cip1 = w_c[:, :-1, :], w_c[:, 1:, :]
 
         # calculate denominators
@@ -91,11 +100,13 @@ class SELoss(nn.Module):
         divisors = self.get_divisors(w_c, w_n, denoms=denominators) # shape: (B, T)
 
         N = torch.sum(shrinked_vad, dim=-1)
+        if 0 in N:
+            N = N + 1
 
         # calculate loss terms
         if divisors.shape != denominators.shape:
             divisors = divisors.unsqueeze(-1).expand_as(denominators)
-        terms = torch.sum(- torch.log(denominators * divisors), dim=-1)
+        terms = torch.sum(- torch.log(denominators * divisors + EPS), dim=-1)
         terms = terms / N
 
         return torch.mean(terms)
@@ -140,16 +151,14 @@ class SELoss(nn.Module):
 
         est_noisy = y_hat + z_hat
         fc, mag = self.m_stft_loss(est_noisy.squeeze(1), noisy_sigs.squeeze(1))
-        if torch.isnan(est_noisy).any():
-            print("passed nan value from ae")
         reconstruction_loss = F.l1_loss(est_noisy, noisy_sigs).to(device) + fc + mag
         if self.just_reconstruction:
             return reconstruction_loss
 
         contrastive_loss = self.contrastive_loss(w_c, w_n, self.match_vad_to_windows(vad_mask, device), device) if self.include_contrastive else 0
         reg_loss = self.regularization_loss(vad_mask, z_hat, noisy_sigs) if self.include_regularization else 0
-
-        return [self.reconstruction_factor * reconstruction_loss, self.contrastive_factor * contrastive_loss, self.noise_regularization_factor * reg_loss]
+        return [self.reconstruction_factor * reconstruction_loss, 0, self.noise_regularization_factor * reg_loss]
+        # return [self.reconstruction_factor * reconstruction_loss, self.contrastive_factor * contrastive_loss, self.noise_regularization_factor * reg_loss]
 
 
 
@@ -169,8 +178,6 @@ class SupSELoss(SELoss):
 
         est_noisy = y_hat + z_hat
         fc, mag = self.m_stft_loss(est_noisy.squeeze(1), noisy_sigs.squeeze(1))
-        if torch.isnan(est_noisy).any():
-            print("passed nan value from ae")
         fc_c, mag_c = self.m_stft_loss(y_hat.squeeze(1), clean_sigs.squeeze(1))
         reconstruction_loss = F.l1_loss(est_noisy, noisy_sigs).to(device) + fc + mag + fc_c + mag_c
         if self.just_reconstruction:

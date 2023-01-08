@@ -117,6 +117,21 @@ def rescale_module(module, reference):
         if isinstance(sub, (nn.Conv1d, nn.ConvTranspose1d)):
             rescale_conv(sub, reference)
 
+class DemucsEncoderBlock(nn.Module):
+
+    def __init__(self, chin, hidden, kernel_size, stride, ch_scale, activation):
+        super().__init__()
+        self.conv1 = nn.Conv1d(chin, hidden, kernel_size, stride)
+        self.act1 = nn.ReLU()
+        self.conv2 = nn.Conv1d(hidden, hidden * ch_scale, 1)
+        self.act2 = activation
+        # self.act2 = activation
+    
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.act1(x)
+        x = self.act2(x)
+        return x
 
 class DemucsEncoder(nn.Module):
     """
@@ -179,13 +194,7 @@ class DemucsEncoder(nn.Module):
         ch_scale = 2 if glu else 1
 
         for index in range(depth):
-            encode = []
-            encode += [
-                nn.Conv1d(chin, hidden, kernel_size, stride),
-                nn.ReLU(),
-                nn.Conv1d(hidden, hidden * ch_scale, 1), activation,
-            ]
-            self.encoder.append(nn.Sequential(*encode))
+            self.encoder.append(DemucsEncoderBlock(chin, hidden, kernel_size, stride, ch_scale, activation))
             chout = hidden
             chin = hidden
             hidden = min(int(growth * hidden), max_hidden)
@@ -210,6 +219,7 @@ class DemucsEncoder(nn.Module):
             std = 1
         length = mix.shape[-1]
         x = mix
+
         # x = F.pad(x, (0, self.valid_length(length) - length))
         if self.resample == 2:
             x = upsample2(x)
@@ -221,6 +231,7 @@ class DemucsEncoder(nn.Module):
             x = encode(x)
             if include_skips:
                 skips.append(x)
+            
         x = x.permute(2, 0, 1)
         x, _ = self.lstm(x)
         x = x.permute(1, 2, 0)
@@ -234,7 +245,7 @@ class DemucsEncoder(nn.Module):
             ret = (x, skips)
         else:
             ret = x
-
+            
         return ret
 
 
@@ -337,6 +348,7 @@ class DemucsJointEncoder(DemucsEncoder):
         args.hidden = 2 * args.hidden
         super().__init__(args)
 
+    
 
 class DemucsDoubleAE(nn.Module):
 

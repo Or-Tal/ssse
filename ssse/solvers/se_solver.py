@@ -50,6 +50,7 @@ class SESolver(BaseSolver):
         #         self.model.parameters(), self.cfg.solver.optim.max_norm
         #     )
         flashy.distrib.sync_model(self.model)
+        torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1000)
         self.optimizer.step()
         if hasattr(self, "lr_scheduler") and self.lr_scheduler:
             self.lr_scheduler.step()

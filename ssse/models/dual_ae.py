@@ -75,14 +75,15 @@ class DualAEJointEncoder(nn.Module):
 
     def forward(self, mix, eval=False):
         ls, skips, std, length = self.encoder(mix, include_skips=True, include_std_len=True)
-        l_c, l_n, skips_c, skips_n = self.split_to_noisy_clean(ls, skips)
+        ls, l_n, skips_c, skips_n = self.split_to_noisy_clean(ls, skips)
+        
         if self.quantizer is not None:
-            l_c = self.quantizer(l_c)
-        y_hat = self.decoder(l_c, [s for s in skips_c], std, length)
+            ls = self.quantizer(ls)
+        y_hat = self.decoder(ls, [s for s in skips_c], std, length)
         if eval:
             return y_hat
         if self.quantizer is not None:
             l_n = self.quantizer(l_n)
         z_hat = self.decoder(l_n, [s for s in skips_n], std, length)
 
-        return l_c, l_n, y_hat, z_hat, self.ft_enc(l_c), self.ft_enc(l_n)
+        return ls, l_n, y_hat, z_hat, self.ft_enc(ls), self.ft_enc(l_n)
