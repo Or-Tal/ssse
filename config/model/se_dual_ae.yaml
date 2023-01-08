@@ -2,7 +2,8 @@
 
 model:
   # instansiation related
-  model_class_name: se_dual_ae
+  model_class_name: demucs_joint_encoder
+  # model_class_name: se_dual_ae
 
   encoder_model: demucs_encoder
   decoder_model: demucs_decoder
