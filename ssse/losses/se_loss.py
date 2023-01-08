@@ -45,11 +45,14 @@ class SELoss(nn.Module):
         # init list of negative dot products, each of shape: (B, T, Ft)
         # after the similarity function (f): (B, T)
         # note: denoms has a temporal size of T - 1 as it is the result of the denominator's dot products
-        
-        neg_dots = [denoms + EPS, torch.exp(self.f(w_c, w_n[:, :-1]))] if denoms is not None else [torch.exp(self.f(w_c, w_n))]
+        print(f"denoms is none: {denoms in None}")
+        print(f"w_n: {w_n.shape}")
+        print(f"w_c: {w_n.shape}")
+        print(f"denoms: {denoms.shape}")
+        neg_dots = [denoms + EPS, torch.exp(self.f(w_c, w_n))[:, :-1]] if denoms is not None else [torch.exp(self.f(w_c, w_n))]
         for _ in range(NEG_SIZE - 1):
             perm = torch.randperm(w_n.shape[1])
-            neg_dots.append(torch.exp(self.f(w_c, w_n[:, perm][:, :-1])))
+            neg_dots.append(torch.exp(self.f(w_c, w_n[:, perm]))[:, :-1] if denoms is not None else torch.exp(self.f(w_c, w_n[:, perm])))
         
         # stack all denominators (calculated similarities permutations w.r.t w_c)
         neg_dots = torch.stack(neg_dots, dim=-1) # shape: (B, T, NEG_SIZE + 1 (or NEG_SIZE if denoms is None))
