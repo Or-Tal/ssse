@@ -44,10 +44,12 @@ class SELoss(nn.Module):
     def get_divisors(self, w_c, w_n, denoms=None):
         # init list of negative dot products, each of shape: (B, T, Ft)
         # after the similarity function (f): (B, T)
-        neg_dots = [denoms + EPS, torch.exp(self.f(w_c, w_n))] if denoms is not None else [torch.exp(self.f(w_c, w_n))]
+        # note: denoms has a temporal size of T - 1 as it is the result of the denominator's dot products
+        
+        neg_dots = [denoms + EPS, torch.exp(self.f(w_c, w_n[:, :-1]))] if denoms is not None else [torch.exp(self.f(w_c, w_n))]
         for _ in range(NEG_SIZE - 1):
             perm = torch.randperm(w_n.shape[1])
-            neg_dots.append(torch.exp(self.f(w_c, w_n[:, perm])))
+            neg_dots.append(torch.exp(self.f(w_c, w_n[:, perm][:, :-1])))
         
         # stack all denominators (calculated similarities permutations w.r.t w_c)
         neg_dots = torch.stack(neg_dots, dim=-1) # shape: (B, T, NEG_SIZE + 1 (or NEG_SIZE if denoms is None))
