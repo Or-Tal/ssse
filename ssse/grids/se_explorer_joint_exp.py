@@ -21,7 +21,7 @@ def explorer(launcher):
         'loss.loss_name': 'se_loss',
         'loss.reconstruction_factor' : 1,
         'loss.contrastive_factor' : 1,
-        'loss.energy_factor' : 1,
+        'loss.energy_factor' : 0.01,
         'loss.noise_regularization_factor' : 10,
         'model.include_quantizer': True,
         'model.quantizer_name': 'rvq',
