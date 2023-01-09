@@ -25,7 +25,7 @@ def explorer(launcher):
         'loss.noise_regularization_factor' : 10,
         'model.include_quantizer': True,
         'model.quantizer_name': 'rvq',
-        'label': 'v_0_0_redo_contrastive_loss',
+        'label': 'v_0_1',
         'loss.include_contrastive': True,
         'dset.sample_from_gaussian': True
         # 'dset.sample_from_gaussian': True,
