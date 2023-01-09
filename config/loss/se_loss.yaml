@@ -7,9 +7,11 @@ loss:
   just_reconstruction: False
   reconstruction_factor: 1
   contrastive_factor: 1
+  energy_factor: 1
   noise_regularization_factor: 10
   stft_sc_factor: 0.1
   stft_mag_factor: 0.1
   include_regularization: True
   include_contrastive: True
+  include_energy_loss: True
   window_size: ${model.feature_encoder.window_size}

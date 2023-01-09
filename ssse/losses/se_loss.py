@@ -24,6 +24,8 @@ class SELoss(nn.Module):
         self.include_regularization = loss_cfg.include_regularization
         self.include_contrastive = loss_cfg.include_contrastive
         self.window_size = loss_cfg.window_size
+        self.include_energy_loss = loss_cfg.include_energy_loss
+        self.energy_factor = loss_cfg.energy_factor
 
     def f(self, a, b):
         return 1 + F.cosine_similarity(a, b, -1)
@@ -61,17 +63,19 @@ class SELoss(nn.Module):
 
         return 1 / neg_dots
     
+    def energy_loss(self, y_hat, stretched_vad_mask):
+        return - torch.mean(torch.sum(torch.log(torch.masked_select(y_hat ** 2, stretched_vad_mask)), dim=-1))
+
+    # def contrastive_loss(self, w_c, w_n, vad_mask, device):
+    #     # permute for simplicity
+    #     w_c = w_c.permute((0, 2, 1))  # batch x T x Ft
+    #     w_n = w_n.permute((0, 2, 1))  # batch x T x Ft
+
+    #     # match vad to windows
+    #     shrinked_vad = self.match_vad_to_windows(vad_mask, device)
+
 
     def contrastive_loss(self, w_c, w_n, vad_mask, device):
-        # permute for simplicity
-        w_c = w_c.permute((0, 2, 1))  # batch x T x Ft
-        w_n = w_n.permute((0, 2, 1))  # batch x T x Ft
-
-        # match vad to windows
-        shrinked_vad = self.match_vad_to_windows(vad_mask, device)
-
-
-    def contrastive_loss_old(self, w_c, w_n, vad_mask, device):
         # permute for simplicity
         w_c = w_c.permute((0, 2, 1))  # batch x T x Ft
         w_n = w_n.permute((0, 2, 1))  # batch x T x Ft
@@ -138,6 +142,8 @@ class SELoss(nn.Module):
         stretched_vad = stretched_vad.bool()
         noises_from_z = torch.masked_select(z_hat, ~stretched_vad).flatten()
         noises_from_noisy = torch.masked_select(noisy, ~stretched_vad).flatten()
+        if self.include_energy_loss: # return stretched vad as well
+            return F.mse_loss(noises_from_z, noises_from_noisy), stretched_vad
         return F.mse_loss(noises_from_z, noises_from_noisy)
 
     def forward(self, outputs, noisy_sigs, vad_mask):
@@ -156,8 +162,19 @@ class SELoss(nn.Module):
             return reconstruction_loss
 
         contrastive_loss = self.contrastive_loss(w_c, w_n, self.match_vad_to_windows(vad_mask, device), device) if self.include_contrastive else 0
-        reg_loss = self.regularization_loss(vad_mask, z_hat, noisy_sigs) if self.include_regularization else 0
-        return [self.reconstruction_factor * reconstruction_loss, 0, self.noise_regularization_factor * reg_loss]
+        if self.include_energy_loss:
+            if self.include_regularization:
+                reg_loss, stretched_vad = self.regularization_loss(vad_mask, z_hat, noisy_sigs)
+            else:
+                reg_loss = 0
+                stretched_vad = self.stretch_vad_mask_over_input_length(vad_mask, y_hat).unsqueeze(1)
+        else:
+            reg_loss = self.regularization_loss(vad_mask, z_hat, noisy_sigs) if self.include_regularization else 0
+            stretched_vad = None
+        
+        energy_loss = self.energy_loss(y_hat, stretched_vad)
+
+        return [self.reconstruction_factor * reconstruction_loss, 0, self.noise_regularization_factor * reg_loss, self.energy_factor * energy_loss]
         # return [self.reconstruction_factor * reconstruction_loss, self.contrastive_factor * contrastive_loss, self.noise_regularization_factor * reg_loss]
 
 
