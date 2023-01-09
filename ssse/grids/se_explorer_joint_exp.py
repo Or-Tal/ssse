@@ -26,7 +26,7 @@ def explorer(launcher):
         'model.include_quantizer': True,
         'model.quantizer_name': 'rvq',
         'label': 'v_0_0_redo_contrastive_loss',
-        'loss.include_contrastive': True
+        'loss.include_contrastive': True,
         'dset.sample_from_gaussian': True
         # 'dset.sample_from_gaussian': True,
     })
