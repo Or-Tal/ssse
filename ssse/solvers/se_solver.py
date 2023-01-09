@@ -80,6 +80,7 @@ class SESolver(BaseSolver):
         metrics['reconst'] = losses[0]
         metrics['cont'] = losses[1]
         metrics['reg'] = losses[2]
+        metrics['energy'] = losses[3]
         if is_training:
             metrics['lr'] = self.optimizer.param_groups[0]['lr']
             self.optimize(loss)

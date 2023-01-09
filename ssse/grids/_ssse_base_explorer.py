@@ -29,27 +29,29 @@ class SsseBaseExplorer(BaseExplorer):
                     tt.leaf("epoch"),
                     tt.leaf("tot_loss", ".4f"),  # total loss
                     tt.leaf("reconst", ".4f"),  # total loss
-                    tt.leaf("cont", ".4f"),  # total loss
-                    tt.leaf("reg", ".4f"),  # total loss
+                    tt.leaf("cont", ".5f"),  # total loss
+                    tt.leaf("reg", ".3f"),  # total loss
+                    tt.leaf("energy", ".3f"),  # total loss
                 ],
                 align=">",
             ),
             tt.group(
                 "valid",
                 [
-                    tt.leaf("tot_loss", ".4f"),
+                    tt.leaf("tot_loss", ".4f"),  # total loss
                     tt.leaf("reconst", ".4f"),  # total loss
-                    tt.leaf("cont", ".4f"),  # total loss
-                    tt.leaf("reg", ".4f"),  # total loss
+                    tt.leaf("cont", ".5f"),  # total loss
+                    tt.leaf("reg", ".3f"),  # total loss
+                    tt.leaf("energy", ".3f"),  # total loss
                 ],
                 align=">",
             ),
             tt.group(
                 "evaluate",
                 [
-                    tt.leaf("snr", ".3f"),
-                    tt.leaf("pesq", ".3f"),
-                    tt.leaf("stoi", ".3f"),
+                    tt.leaf("snr", ".2f"),
+                    tt.leaf("pesq", ".2f"),
+                    tt.leaf("stoi", ".2f"),
                 ],
                 align=">",
             ),
