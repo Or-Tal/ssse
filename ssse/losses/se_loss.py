@@ -64,6 +64,10 @@ class SELoss(nn.Module):
         return 1 / neg_dots
     
     def energy_loss(self, y_hat, stretched_vad_mask):
+        if y_hat.shape[-1] > stretched_vad_mask.shape[-1]:
+            y_hat = y_hat[..., :stretched_vad_mask.shape[-1]]
+        if stretched_vad_mask.shape[-1] > y_hat.shape[-1]:
+            stretched_vad_mask = stretched_vad_mask[..., :y_hat.shape[-1]]
         return - torch.mean(torch.sum(torch.log(torch.masked_select(y_hat ** 2, stretched_vad_mask)), dim=-1))
 
     # def contrastive_loss(self, w_c, w_n, vad_mask, device):
